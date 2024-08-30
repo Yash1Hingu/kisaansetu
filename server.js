@@ -5,7 +5,7 @@ port = process.env.PORT || 3000;
 
 
 const mongoose = require('mongoose');
-const uri = 'mongodb://localhost:27017/kisaansetuDb';
+const uri = 'mongodb://localhost:27017/kisaansetudummyDb';
 Product = require('./api/models/kishansetuModel');
 
 

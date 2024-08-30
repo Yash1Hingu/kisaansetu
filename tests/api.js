@@ -19,4 +19,24 @@ async function createProduct(url, productData) {
     return response;
 }
 
-module.exports = { fetchProduct, createProduct };
+async function updateProduct(url, productData) {
+
+    productData = qs.stringify(productData);
+
+    const response = await axios.put(url, productData, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    });
+
+    return response;
+}
+
+async function deleteProduct(url) {
+    
+    const response = await axios.delete(url);
+
+    return response;
+}
+
+module.exports = { fetchProduct, createProduct, updateProduct, deleteProduct };
