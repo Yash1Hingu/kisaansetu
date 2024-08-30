@@ -36,7 +36,7 @@ exports.create_a_product = (req, res) => {
 
     new_product.save()
         .then(product => res.status(201).json(product))
-        .catch(err => res.send({ message: err.message }));
+        .catch(err => res.status(400).send({ message: err.message }));
 };
 
 exports.read_a_product = (req, res) => {
@@ -53,8 +53,14 @@ exports.read_a_product = (req, res) => {
 
 exports.update_a_product = (req, res) => {
     Product.findOneAndUpdate({ _id: req.params.productId }, req.body, { new: true })
-        .then(product => res.json(product))
-        .catch(err => res.send(err));
+        .then(product => {
+            if(product){
+                res.json(product);
+            } else {
+                res.status(404).send({message: 'product not exits'});
+            }
+        })
+        .catch(err => res.status(400).send(err));
 };
 
 exports.delete_a_product = (req, res) => {
@@ -66,5 +72,5 @@ exports.delete_a_product = (req, res) => {
                 res.status(404).json({ message: 'Product not found' });
             }
         })
-        .catch(err => res.send(err));
+        .catch(err => res.status(400).send(err));
 };

@@ -108,3 +108,91 @@ describe('Positive Test Cases', () => {
         expect(typeof data.verified).toBe('boolean');
     })
 });
+
+describe('Negative Test Cases', () => {
+    let invalidProductId = '123456789101112131415123';
+
+    test('fails to fetch data from Kisaan Setu API with invalid URL', async () => {
+
+        try {
+            const response = await fetchProduct('http://localhost:3000/api/invalid-products');
+        } catch (error) {
+            expect(error.response.status).toEqual(404);
+        }
+
+    })
+
+    test('fails to create a product with missing required fields', async () => {
+        const invalidProductData = {
+            subtitle: "Kashmir Apple",  // Missing title, price, weight, etc.
+            rating: 4,
+            category: "fruit",
+            verified: true
+        };
+
+        try {
+            const response = await createProduct('http://localhost:3000/api/products', invalidProductData);
+        } catch (error) {
+            expect(error.response.status).toEqual(400);
+        }
+    })
+
+    test('fails to update a product with an invalid product ID', async () => {
+        const productData = {
+            title: "Apple",
+            subtitle: "Golden Delicious Apple",
+            rating: 4,
+            category: "fruit",
+            verified: true,
+            price: 100,
+            weight: 1
+        };
+
+        try {
+            const response = await updateProduct(`http://localhost:3000/api/products/${invalidProductId}`, productData);
+        } catch (error) {
+            expect(error.response.status).toEqual(404);
+        }
+    })
+    
+    test('fails to update a product with an malformed product ID', async () => {
+        const productData = {
+            title: "Apple",
+            subtitle: "Golden Delicious Apple",
+            rating: 4,
+            category: "fruit",
+            verified: true,
+            price: 100,
+            weight: 1
+        };
+
+        const malformedProductId = 'invalid-id';
+
+        try {
+            const response = await updateProduct(`http://localhost:3000/api/products/${malformedProductId}`, productData);
+        } catch (error) {
+            expect(error.response.status).toEqual(400);
+        }
+    })
+
+    test('fails to delete a product with an invaild product id', async () => {
+
+        try {
+            const response = await deleteProduct(`http://localhost:3000/api/products/${invalidProductId}`);
+        } catch (error) {
+            expect(error.response.status).toEqual(404);
+        }
+    })
+
+    test('fails to delete a product with malformed product ID', async () => {
+        const malformedProductId = 'invalid-id';
+
+        try {
+            const response = await deleteProduct(`http://localhost:3000/api/products/${malformedProductId}`);
+        } catch (error) {
+            // Expect a 400 Bad Request error for malformed product ID
+            expect(error.response.status).toEqual(400);
+        }
+    });
+
+})
