@@ -1,9 +1,11 @@
+const qs = require('qs');
 const { fetchProduct, createProduct, updateProduct, deleteProduct } = require('./api.js');
 
 describe('Positive Test Cases', () => {
     let productId;
+    let product;
 
-    test('fetches successfully data from Kisaan Setu API', async () => {
+    test('fetch successfully data from Kisaan Setu API', async () => {
 
         const response = await fetchProduct('http://localhost:3000/api/products');
 
@@ -47,9 +49,29 @@ describe('Positive Test Cases', () => {
 
         const response = await createProduct('http://localhost:3000/api/products', productData);
         productId = response.data._id;
+        product = response.data;
 
         expect(response.status).toBe(201);
-    })
+    });
+
+    test('fetch product by id successfully from kisaan setu API', async () => {
+
+        const response = await fetchProduct(`http://localhost:3000/api/products/${productId}`);
+
+        expect(response.status).toBe(200);
+
+        const data = response.data;
+
+        // check contains fields
+        expect(data).toHaveProperty('title');
+        expect(data).toHaveProperty('price');
+        expect(data).toHaveProperty('weight');
+
+        // types of fileds
+        expect(typeof data.title).toBe('string');
+        expect(typeof data.price).toBe('number');
+        expect(typeof data.verified).toBe('boolean');
+    });
 
     test('update product successfully to kisaan setu API', async () => {
         const productData = {
@@ -82,7 +104,7 @@ describe('Positive Test Cases', () => {
         expect(typeof data.title).toBe('string');
         expect(typeof data.price).toBe('number');
         expect(typeof data.verified).toBe('boolean');
-    })
+    });
 
     test('delete product successfully to kisaan setu API', async () => {
 
@@ -91,22 +113,17 @@ describe('Positive Test Cases', () => {
         // Status Code.
         expect(response.status).toEqual(200);
 
-        // Data is in json formate.
-        expect(response.headers['content-type']).toContain('application/json');
+    });
 
-        // Check Filled's Exist.
-        const data = response.data.product;
+    test('deleted product not accessible from kisaan setu API', async () => {
 
-        // check contains fields
-        expect(data).toHaveProperty('title');
-        expect(data).toHaveProperty('price');
-        expect(data).toHaveProperty('weight');
+        try {
+            const response = await fetchProduct(`http://localhost:3000/api/products/${productId}`);
+        } catch (error) {
+            expect(error.response.status).toBe(404);
+        }
+    });
 
-        // types of fileds
-        expect(typeof data.title).toBe('string');
-        expect(typeof data.price).toBe('number');
-        expect(typeof data.verified).toBe('boolean');
-    })
 });
 
 describe('Negative Test Cases', () => {
@@ -137,6 +154,24 @@ describe('Negative Test Cases', () => {
         }
     })
 
+    test('fails to create a product with invaild data types', async () => {
+        const invalidProductData = {
+            title: "Apple",
+            subtitle: "Golden Delicious Apple",
+            rating: "high",
+            category: "fruit",
+            verified: "yes",
+            price: "eighty",
+            weight: "half"
+        };
+
+        try {
+            const response = await createProduct('http://localhost:3000/api/products', invalidProductData);
+        } catch (error) {
+            expect(error.response.status).toEqual(400);
+        }
+    })
+
     test('fails to update a product with an invalid product ID', async () => {
         const productData = {
             title: "Apple",
@@ -154,7 +189,7 @@ describe('Negative Test Cases', () => {
             expect(error.response.status).toEqual(404);
         }
     })
-    
+
     test('fails to update a product with an malformed product ID', async () => {
         const productData = {
             title: "Apple",

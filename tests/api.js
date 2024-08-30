@@ -33,7 +33,7 @@ async function updateProduct(url, productData) {
 }
 
 async function deleteProduct(url) {
-    
+
     const response = await axios.delete(url);
 
     return response;
